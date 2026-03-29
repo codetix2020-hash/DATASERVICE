@@ -30,4 +30,6 @@ yarn-error.log*
 .env*.local
 .env.local
 .env*.local
+.env.railway
+.env.production
 CURSOR_PROMPT.md

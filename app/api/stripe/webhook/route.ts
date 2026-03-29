@@ -1,13 +1,13 @@
-import { getStripe } from '@/lib/stripe'
-import { resend } from '@/lib/resend'
-import { NextRequest, NextResponse } from 'next/server'
-
-export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
+import { getStripe } from '@/lib/stripe'
+import { getResend } from '@/lib/resend'
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   const response = new NextResponse()
-  
+
   // Anti-caché headers
   response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate')
   response.headers.set('Pragma', 'no-cache')
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   try {
     const stripe = getStripe()
     const sig = request.headers.get('stripe-signature')
-    
+
     if (!sig) {
       return NextResponse.json(
         { error: 'Missing stripe-signature header' },
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.text()
-    
+
     const event = stripe.webhooks.constructEvent(
       body,
       sig,
@@ -34,9 +34,10 @@ export async function POST(request: NextRequest) {
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as any
-      
+
       // Send confirmation email
       try {
+        const resend = getResend()
         await resend.emails.send({
           from: 'noreply@datarescue.es',
           to: session.customer_email,
@@ -55,14 +56,14 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     console.error('Webhook error:', error)
-    
+
     const errorResponse = NextResponse.json(
       { error: 'Webhook error' },
       { status: 400 }
     )
-    
+
     errorResponse.headers.set('Cache-Control', 'no-store, max-age=0')
-    
+
     return errorResponse
   }
 }

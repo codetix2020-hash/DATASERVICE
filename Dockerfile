@@ -28,5 +28,5 @@ COPY --from=builder /app/next.config.js ./
 # Expose port
 EXPOSE 3000
 
-# Start with PORT env var support
-CMD ["sh", "-c", "PORT=${PORT:-3000} npm start"]
+# Start with PORT env var support - use node directly to execute next
+CMD ["sh", "-c", "PORT=${PORT:-3000} node node_modules/.bin/next start"]

@@ -1,7 +1,8 @@
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { resend } from '@/lib/resend'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
   response.headers.set('Expires', '0')
 
   try {
+    const stripe = getStripe()
     const sig = request.headers.get('stripe-signature')
     
     if (!sig) {

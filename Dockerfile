@@ -28,4 +28,4 @@ COPY --from=builder /app/public ./public
 EXPOSE 3000
 
 # Start with port binding
-CMD ["npm", "start"]
+CMD ["sh", "-c", "next start -p ${PORT:-3000}"]

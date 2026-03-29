@@ -27,5 +27,5 @@ COPY --from=builder /app/public ./public
 # Expose port
 EXPOSE 3000
 
-# Start with port binding
-CMD ["sh", "-c", "next start -p ${PORT:-3000}"]
+# Start with port binding on all interfaces
+CMD ["sh", "-c", "next start -p ${PORT:-3000} --hostname 0.0.0.0"]

@@ -1,16 +1,19 @@
-# Minimal production dockerfile
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Dependencies
+# Install all dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install
+
+# Copy source
+COPY . .
 
 # Build Next.js
-COPY . .
 RUN npm run build
 
-# Expose and start
+# Expose port
 EXPOSE 3000
-CMD ["npm", "start"]
+
+# Use next standalone
+CMD ["node", ".next/standalone/server.js"]

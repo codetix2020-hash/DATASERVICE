@@ -18,17 +18,14 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install dependencies (production only)
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy built app from builder
+# Copy everything from builder (including node_modules needed for next CLI)
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
 
 # Expose port
 EXPOSE 3000
 
-# Start (listen on 0.0.0.0, respect PORT env var from Railway)
-CMD ["sh", "-c", "node_modules/.bin/next start -p ${PORT:-3000} --hostname 0.0.0.0"]
+# Start with port binding
+CMD ["npm", "start"]

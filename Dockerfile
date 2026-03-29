@@ -2,14 +2,23 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install
 
-# Copy source and build
 COPY . .
 RUN npm run build
 
-# Expose and start
+# Remove dev dependencies
+RUN npm prune --production
+
+# Copy standalone server + static files for standalone mode
+RUN mkdir -p .next/standalone/.next && \
+    cp -r .next/static .next/standalone/.next/
+
 EXPOSE 3000
-CMD ["npm", "start"]
+ENV NODE_ENV=production
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
+
+WORKDIR /app/.next/standalone
+CMD ["node", "server.js"]

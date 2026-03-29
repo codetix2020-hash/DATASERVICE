@@ -18,7 +18,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy everything from builder (including node_modules needed for next CLI)
+# Copy built app and dependencies
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
@@ -27,5 +27,5 @@ COPY --from=builder /app/public ./public
 # Expose port
 EXPOSE 3000
 
-# Start with port binding on all interfaces
-CMD ["sh", "-c", "next start -p ${PORT:-3000} --hostname 0.0.0.0"]
+# Start
+CMD ["npm", "start"]

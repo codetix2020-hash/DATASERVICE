@@ -1,12 +1,14 @@
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PRICE_ONE_TIME || 'price_1TG770Fnv2zNlVdF197EUR'
 
 export async function POST(request: NextRequest) {
   try {
+    const stripe = getStripe()
     const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
 
     const session = await stripe.checkout.sessions.create({

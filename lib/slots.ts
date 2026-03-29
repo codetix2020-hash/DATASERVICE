@@ -1,5 +1,5 @@
 import type Stripe from 'stripe'
-import { stripe } from './stripe'
+import { getStripe } from './stripe'
 
 export const WEEKLY_SLOT_TOTAL = 5
 
@@ -28,6 +28,7 @@ function isDataRescuePayment(session: Stripe.Checkout.Session): boolean {
  * Usa la API de Stripe (servidor); no depende del reloj del cliente.
  */
 export async function getRemainingSlotsThisWeek(): Promise<number> {
+  const stripe = getStripe()
   const weekStart = getUtcMondayStartSeconds()
   let used = 0
   let startingAfter: string | undefined

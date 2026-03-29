@@ -1,28 +1,16 @@
-# Build stage
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-# Install dependencies
-COPY package*.json ./
-RUN npm ci
-
-# Copy source
-COPY . .
-
-# Build Next.js
-RUN npm run build
-
-# Runtime stage
+# Minimal production dockerfile
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy entire built app from builder (everything needed for next start)
-COPY --from=builder /app ./
+# Dependencies
+COPY package*.json ./
+RUN npm ci --only=production
 
-# Expose port
+# Build Next.js
+COPY . .
+RUN npm run build
+
+# Expose and start
 EXPOSE 3000
-
-# Start with PORT env var support - use node directly to execute next
-CMD ["sh", "-c", "PORT=${PORT:-3000} node node_modules/.bin/next start"]
+CMD ["npm", "start"]

@@ -18,18 +18,8 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy built app and dependencies
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.js ./
-COPY --from=builder /app/postcss.config.js ./
-COPY --from=builder /app/tailwind.config.ts ./
-COPY --from=builder /app/tsconfig.json ./
-COPY --from=builder /app/app ./app
-COPY --from=builder /app/components ./components
-COPY --from=builder /app/lib ./lib
+# Copy entire built app from builder (everything needed for next start)
+COPY --from=builder /app ./
 
 # Expose port
 EXPOSE 3000

@@ -23,7 +23,7 @@ export function CTASection({
         <div className="flex justify-center mb-8">
           <CheckoutButton
             priceId={priceId}
-            variant="black"
+            variant="primary"
             disabled={!slotsAvailable}
             aria-label="Empezar limpieza de base de datos por 197 euros"
           >

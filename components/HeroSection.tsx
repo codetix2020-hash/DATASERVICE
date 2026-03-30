@@ -28,7 +28,7 @@ export function HeroSection({
         <div className="flex justify-center mb-6">
           <CheckoutButton
             priceId={priceId}
-            variant="green"
+            variant="primary"
             disabled={!slotsAvailable}
             aria-label="Limpiar base de datos ahora por 197 euros con pago seguro"
           >

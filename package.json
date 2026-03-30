@@ -22,8 +22,12 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.14",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.7.0",
     "postcss": "^8.4.24",
+    "shadcn-ui": "^0.9.5",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "zod": "^4.3.6"
   }
 }

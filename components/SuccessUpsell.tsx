@@ -23,7 +23,7 @@ export function SuccessUpsell({
         <CheckoutButton
           priceId={subscriptionPriceId}
           mode="subscription"
-          variant="green"
+          variant="primary"
           disabled={!subscriptionPriceId}
           aria-label="Suscribirse al mantenimiento recurrente por 97 euros al mes"
         >

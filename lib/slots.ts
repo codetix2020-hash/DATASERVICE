@@ -26,33 +26,44 @@ function isDataRescuePayment(session: Stripe.Checkout.Session): boolean {
 /**
  * Cuenta pagos completados esta semana (UTC) para el producto principal.
  * Usa la API de Stripe (servidor); no depende del reloj del cliente.
+ * Si STRIPE_SECRET_KEY no está disponible, devuelve el total (fallback seguro).
  */
 export async function getRemainingSlotsThisWeek(): Promise<number> {
-  const stripe = getStripe()
-  const weekStart = getUtcMondayStartSeconds()
-  let used = 0
-  let startingAfter: string | undefined
-
-  for (;;) {
-    const page = await stripe.checkout.sessions.list({
-      created: { gte: weekStart },
-      limit: 100,
-      starting_after: startingAfter,
-    })
-
-    for (const session of page.data) {
-      if (isDataRescuePayment(session)) {
-        used += 1
-      }
-    }
-
-    if (!page.has_more || page.data.length === 0) {
-      break
-    }
-
-    const last = page.data[page.data.length - 1]
-    startingAfter = last.id
+  // Si la variable de entorno no está configurada, devuelve el total disponible
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return WEEKLY_SLOT_TOTAL
   }
 
-  return Math.max(0, WEEKLY_SLOT_TOTAL - used)
+  try {
+    const stripe = getStripe()
+    const weekStart = getUtcMondayStartSeconds()
+    let used = 0
+    let startingAfter: string | undefined
+
+    for (;;) {
+      const page = await stripe.checkout.sessions.list({
+        created: { gte: weekStart },
+        limit: 100,
+        starting_after: startingAfter,
+      })
+
+      for (const session of page.data) {
+        if (isDataRescuePayment(session)) {
+          used += 1
+        }
+      }
+
+      if (!page.has_more || page.data.length === 0) {
+        break
+      }
+
+      const last = page.data[page.data.length - 1]
+      startingAfter = last.id
+    }
+
+    return Math.max(0, WEEKLY_SLOT_TOTAL - used)
+  } catch {
+    // Si hay cualquier error (API inválida, etc), devuelve el total como fallback
+    return WEEKLY_SLOT_TOTAL
+  }
 }

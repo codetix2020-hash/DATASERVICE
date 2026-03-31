@@ -1,21 +1,18 @@
-FROM node:20-alpine
-
+FROM node:20-alpine AS builder
 WORKDIR /app
-
 COPY package*.json ./
 RUN npm install
-
 COPY . .
 RUN npm run build
 
-RUN npm prune --production
-
-# Copy static for standalone mode
-RUN cp -r .next/static .next/standalone/.next/ || true
-
-EXPOSE 3000
+FROM node:20-alpine
+WORKDIR /app
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package*.json ./
 
-# Start with port binding on all interfaces
+EXPOSE 3000
 CMD ["npm", "start"]

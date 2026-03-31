@@ -1,33 +1,35 @@
-import { Resend } from 'resend';
-import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { Resend } from 'resend'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 interface EmailRequest {
-  to: string;
-  subject: string;
-  body: string;
+  to: string
+  subject: string
+  body: string
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const body: EmailRequest = await request.json();
+    const body: EmailRequest = await request.json()
 
     // Validar campos requeridos
     if (!body.to || !body.subject || !body.body) {
-      return NextResponse.json(
-        { error: 'Missing required fields: to, subject, body' },
-        { status: 400 }
-      );
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: to, subject, body' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      )
     }
 
     // Validar email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(body.to)) {
-      return NextResponse.json(
-        { error: 'Invalid email address' },
-        { status: 400 }
-      );
+      return new Response(
+        JSON.stringify({ error: 'Invalid email address' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      )
     }
 
     // Enviar email vía Resend
@@ -36,25 +38,25 @@ export async function POST(request: NextRequest) {
       to: body.to,
       subject: body.subject,
       html: body.body,
-    });
+    })
 
     // Resend retorna { id, error } o { id, data }
     if (response.error) {
-      return NextResponse.json(
-        { error: response.error.message || 'Failed to send email' },
-        { status: 500 }
-      );
+      return new Response(
+        JSON.stringify({ error: response.error.message || 'Failed to send email' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      )
     }
 
-    return NextResponse.json(
-      { success: true, messageId: response.data?.id },
-      { status: 200 }
-    );
+    return new Response(
+      JSON.stringify({ success: true, messageId: response.data?.id }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    )
   } catch (error) {
-    console.error('Email send error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('Email send error:', error)
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    )
   }
 }
